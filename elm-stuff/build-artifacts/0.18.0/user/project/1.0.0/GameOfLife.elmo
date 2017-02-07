@@ -1,0 +1,155 @@
+var _user$project$GameOfLife$willBeAlive = F3(
+	function (c, w, d) {
+		var debug1 = A2(_elm_lang$core$Debug$log, 'cell', c);
+		var isAlive = A2(_elm_lang$core$Set$member, c, w);
+		var debug3 = A2(_elm_lang$core$Debug$log, 'isAlive', isAlive);
+		var nb = A2(_elm_lang$core$Dict$get, c, d);
+		var debug2 = A2(_elm_lang$core$Debug$log, 'nb', nb);
+		var _p0 = isAlive;
+		if (_p0 === true) {
+			var _p1 = nb;
+			if (_p1.ctor === 'Just') {
+				var _p2 = _p1._0;
+				return (_elm_lang$core$Native_Utils.cmp(_p2, 2) < 0) ? false : (_elm_lang$core$Native_Utils.eq(_p2, 2) ? true : (_elm_lang$core$Native_Utils.eq(_p2, 3) ? true : false));
+			} else {
+				return false;
+			}
+		} else {
+			var _p3 = nb;
+			if (_p3.ctor === 'Just') {
+				return _elm_lang$core$Native_Utils.eq(_p3._0, 3);
+			} else {
+				return false;
+			}
+		}
+	});
+var _user$project$GameOfLife$addNeighbor = F2(
+	function (c, d) {
+		var nb = A2(_elm_lang$core$Dict$get, c, d);
+		var _p4 = nb;
+		if (_p4.ctor === 'Just') {
+			return A3(_elm_lang$core$Dict$insert, c, _p4._0 + 1, d);
+		} else {
+			return A3(_elm_lang$core$Dict$insert, c, 1, d);
+		}
+	});
+var _user$project$GameOfLife$first = function (cell) {
+	var _p5 = _elm_lang$core$List$head(cell);
+	if (_p5.ctor === 'Just') {
+		return _p5._0;
+	} else {
+		return -1;
+	}
+};
+var _user$project$GameOfLife$second = function (cell) {
+	var sublist = _elm_lang$core$List$tail(cell);
+	var _p6 = sublist;
+	if (_p6.ctor === 'Just') {
+		return _user$project$GameOfLife$first(_p6._0);
+	} else {
+		return -1;
+	}
+};
+var _user$project$GameOfLife$cell = F2(
+	function (x, y) {
+		return {
+			ctor: '::',
+			_0: x,
+			_1: {
+				ctor: '::',
+				_0: y,
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+var _user$project$GameOfLife$neighbors = function (c) {
+	return {
+		ctor: '::',
+		_0: A2(
+			_user$project$GameOfLife$cell,
+			_user$project$GameOfLife$first(c) - 1,
+			_user$project$GameOfLife$second(c) - 1),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_user$project$GameOfLife$cell,
+				_user$project$GameOfLife$first(c),
+				_user$project$GameOfLife$second(c) - 1),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_user$project$GameOfLife$cell,
+					_user$project$GameOfLife$first(c) + 1,
+					_user$project$GameOfLife$second(c) - 1),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_user$project$GameOfLife$cell,
+						_user$project$GameOfLife$first(c) - 1,
+						_user$project$GameOfLife$second(c)),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_user$project$GameOfLife$cell,
+							_user$project$GameOfLife$first(c) + 1,
+							_user$project$GameOfLife$second(c)),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_user$project$GameOfLife$cell,
+								_user$project$GameOfLife$first(c) - 1,
+								_user$project$GameOfLife$second(c) + 1),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_user$project$GameOfLife$cell,
+									_user$project$GameOfLife$first(c),
+									_user$project$GameOfLife$second(c) + 1),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_user$project$GameOfLife$cell,
+										_user$project$GameOfLife$first(c) + 1,
+										_user$project$GameOfLife$second(c) + 1),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	};
+};
+var _user$project$GameOfLife$updateNeighbors = F2(
+	function (c, dict) {
+		return A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (c, d) {
+					return A2(_user$project$GameOfLife$addNeighbor, c, d);
+				}),
+			dict,
+			_user$project$GameOfLife$neighbors(c));
+	});
+var _user$project$GameOfLife$step = function (w) {
+	var nbNeighbor = A3(
+		_elm_lang$core$Set$foldl,
+		F2(
+			function (c, d) {
+				return A2(_user$project$GameOfLife$updateNeighbors, c, d);
+			}),
+		_elm_lang$core$Dict$empty,
+		w);
+	var forDebug = A2(_elm_lang$core$Debug$log, 'nb', nbNeighbor);
+	return A2(
+		_elm_lang$core$Set$filter,
+		function (c) {
+			return A3(_user$project$GameOfLife$willBeAlive, c, w, nbNeighbor);
+		},
+		_elm_lang$core$Set$fromList(
+			_elm_lang$core$Dict$keys(nbNeighbor)));
+};
+var _user$project$GameOfLife$world = function (cells) {
+	return _elm_lang$core$Set$fromList(cells);
+};
