@@ -10,8 +10,8 @@ type alias World =
     Set Cell
 
 
-world : List Cell -> World
-world cells =
+createWorld : List Cell -> World
+createWorld cells =
     Set.fromList cells
 
 
@@ -46,6 +46,32 @@ second cell =
             -1
 
 
+dimension : World -> (Cell -> Int) -> Int
+dimension world axis =
+    let
+        max =
+            Set.map axis world
+                |> Set.toList
+                |> List.maximum
+    in
+        case max of
+            Just value ->
+                value
+
+            Nothing ->
+                0
+
+
+width : World -> Int
+width world =
+    dimension world first
+
+
+height : World -> Int
+height world =
+    dimension world second
+
+
 cellNeighbors : Cell -> List Cell
 cellNeighbors c =
     [ cell (first c - 1) (second c - 1)
@@ -60,17 +86,17 @@ cellNeighbors c =
 
 
 addOneNeighborAlive : Cell -> Dict Cell Int -> Dict Cell Int
-addOneNeighborAlive c d =
+addOneNeighborAlive cell howManyNeigborsAreAlive =
     let
         nb =
-            get c d
+            get cell howManyNeigborsAreAlive
     in
         case nb of
             Just value ->
-                Dict.insert c (value + 1) d
+                Dict.insert cell (value + 1) howManyNeigborsAreAlive
 
             Nothing ->
-                Dict.insert c 1 d
+                Dict.insert cell 1 howManyNeigborsAreAlive
 
 
 computeHowManyNeighborsAreAlive : Cell -> Dict Cell Int -> Dict Cell Int
